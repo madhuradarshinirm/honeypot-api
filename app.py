@@ -4,6 +4,10 @@ app = Flask(__name__)
 
 API_KEY = "AIMM2025"
 
+@app.route("/")
+def home():
+    return "Honeypot API Running Successfully!"
+
 @app.route("/honeypot", methods=["POST"])
 def honeypot():
     key = request.headers.get("x-api-key")
@@ -46,10 +50,6 @@ def honeypot():
         intelligence["recommendation"] = "Be cautious."
 
     return jsonify(intelligence)
-
-@app.route("/")
-def home():
-    return "Honeypot API Running Successfully!"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
