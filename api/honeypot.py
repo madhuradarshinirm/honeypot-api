@@ -50,3 +50,9 @@ def honeypot():
 
 def handler(event, context):
     return handle_request(app, event, context)
+
+
+    return jsonify(intelligence)
+
+def handler(event, context):
+    return handle_request(app, event, context)
