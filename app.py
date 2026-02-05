@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+# Your API key
 API_KEY = "AIMM2025"
 
 @app.route("/")
@@ -10,16 +11,38 @@ def home():
 
 @app.route("/honeypot", methods=["POST"])
 def honeypot():
+    # Authentication
     key = request.headers.get("x-api-key")
     if key != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
 
     data = request.json
-    if not data or "message" not in data:
-        return jsonify({"error": "No scam message provided"}), 400
 
-    scam_message = data["message"].lower()
+    if not data:
+        return jsonify({"error": "Invalid or empty JSON"}), 400
 
+    # Accept multiple possible message formats
+    scam_message = None
+
+    # Case 1: {"message": "text"}
+    if isinstance(data.get("message"), str):
+        scam_message = data["message"]
+
+    # Case 2: {"scam_message": "text"}
+    elif isinstance(data.get("scam_message"), str):
+        scam_message = data["scam_message"]
+
+    # Case 3: nested: {"message": {"text": "text"}}
+    elif isinstance(data.get("message"), dict):
+        scam_message = data["message"].get("text") or data["message"].get("content")
+
+    # If no valid message
+    if not scam_message:
+        return jsonify({"error": "No valid scam message provided"}), 400
+
+    scam_message = scam_message.lower()
+
+    # Scam detection logic
     intelligence = {
         "scam_type": "",
         "risk_level": "",
